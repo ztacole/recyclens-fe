@@ -174,7 +174,7 @@ export default function Blog() {
                   className="bg-white rounded-xl shadow-md overflow-hidden"
                 >
                   <img
-                    src={`/api/blog_thumbnails/${post.thumbnail}`}
+                    src={`https://capstone-be-production-3f8e.up.railway.app/blog_thumbnails/${post.thumbnail}`}
                     alt={post.title}
                     className="h-48 w-full object-cover"
                     onError={(e) => {
