@@ -123,7 +123,7 @@ export default function Blog() {
             <div className="md:flex">
               <div className="md:w-1/2">
                 <img
-                  src={`/api/blog_thumbnails/${featuredPost.thumbnail}`}
+                  src={`https://capstone-be-production-3f8e.up.railway.app/blog_thumbnails/${featuredPost.thumbnail}`}
                   alt={featuredPost.title}
                   className="h-96 w-full object-cover"
                   onError={(e) => {
