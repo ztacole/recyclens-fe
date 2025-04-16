@@ -4,7 +4,7 @@ import FormData from 'form-data';
 
 export const config = {
   api: {
-    bodyParser: false, // WAJIB untuk formidable
+    bodyParser: false,
   },
 };
 
@@ -18,9 +18,9 @@ export default async function handler(req, res) {
     }
 
     try {
-      const file = files.file; // ← di sini baru aman
-      const formData = new FormData();
+      const file = Array.isArray(files.file) ? files.file[0] : files.file;
 
+      const formData = new FormData();
       formData.append('file', fs.createReadStream(file.filepath), file.originalFilename);
 
       const response = await fetch("https://web-production-c8bf2.up.railway.app/predict", {
