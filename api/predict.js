@@ -1,41 +1,42 @@
-import formidable from 'formidable';
-import fs from 'fs';
-import FormData from 'form-data';
-
-// For Vercel serverless functions
-export default async function (req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const form = new formidable.IncomingForm({ keepExtensions: true });
+// api/predict.js
+export const config = {
+    runtime: 'edge',
+  };
   
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.error('Form parse error:', err);
-      return res.status(500).json({ error: 'Error parsing form' });
+  export default async function handler(request) {
+    if (request.method !== 'POST') {
+      return new Response(
+        JSON.stringify({ error: 'Method not allowed' }),
+        { status: 405, headers: { 'Content-Type': 'application/json' } }
+      );
     }
-    
+  
     try {
-      const file = files.file;
-      const formData = new FormData();
+      // Get the form data from the request
+      const formData = await request.formData();
       
-      formData.append('file', fs.createReadStream(file.filepath), {
-        filename: file.originalFilename,
-        contentType: file.mimetype,
-      });
-      
+      // Forward the request to your ML API
       const response = await fetch("https://web-production-c8bf2.up.railway.app/predict", {
         method: 'POST',
         body: formData,
-        headers: formData.getHeaders(),
       });
       
+      // Get the response from the ML API
       const data = await response.json();
-      res.status(response.status).json(data);
+      
+      // Return the response
+      return new Response(
+        JSON.stringify(data),
+        { 
+          status: response.status, 
+          headers: { 'Content-Type': 'application/json' } 
+        }
+      );
     } catch (error) {
-      console.error('Error forwarding to ML backend:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
+      console.error('Error processing request:', error);
+      return new Response(
+        JSON.stringify({ error: 'Internal Server Error' }),
+        { status: 500, headers: { 'Content-Type': 'application/json' } }
+      );
     }
-  });
-}
+  }
