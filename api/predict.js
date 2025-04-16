@@ -24,12 +24,19 @@ export default async function handler(req, res) {
             const file = files.file;
 
             const formData = new FormData();
-            formData.append('file', fs.createReadStream(file.filepath), file.originalFilename);
+            formData.append('file', fs.createReadStream(file.filepath), {
+                filename: file.originalFilename,
+                contentType: file.mimetype,
+            });
+
+            console.log("Forwarding to ML backend with file:", file.filepath);
+            console.log("FormData headers:", formData.getHeaders());
+
 
             const response = await fetch("https://web-production-c8bf2.up.railway.app/predict", {
                 method: 'POST',
                 body: formData,
-                headers: formData.getHeaders(), // penting!
+                headers: formData.getHeaders(), // ← penting! jangan ubah jadi JSON
             });
 
             const data = await response.json();
