@@ -50,10 +50,7 @@ const Scan = () => {
         body: formData,
       });
 
-      const text = await response.text();
-      console.log("ML backend response:", text);
-
-      const data = JSON.parse(text);
+      const data = await response.json();
 
       if (!response.ok) {
         throw new Error(

@@ -19,6 +19,7 @@ export default async function handler(req, res) {
 
     try {
       const file = Array.isArray(files.file) ? files.file[0] : files.file;
+      if (!file) return res.status(400).json({ error: "No file received" });
 
       const formData = new FormData();
       formData.append('file', fs.createReadStream(file.filepath), file.originalFilename);
@@ -29,8 +30,9 @@ export default async function handler(req, res) {
         headers: formData.getHeaders(),
       });
 
-      const data = await response.json();
-      res.status(response.status).json(data);
+      const text = await response.text(); // debug dulu
+      console.log("ML backend response:", text);
+      res.status(response.status).send(text); // sementara pakai send bukan json
     } catch (error) {
       console.error('Error forwarding to ML backend:', error);
       res.status(500).json({ error: 'Internal Server Error' });
