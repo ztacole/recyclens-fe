@@ -45,11 +45,7 @@ const Scan = () => {
       const formData = new FormData();
       formData.append("file", file);
 
-      // const apiBaseUrl = import.meta.env.DEV
-      //   ? "/model"
-      //   : import.meta.env.VITE_API_MODEL_URL;
-
-      const response = await fetch(`api/predict`, {
+      const response = await fetch(`/api/predict`, {
         method: "POST",
         body: formData,
       });
