@@ -1,12 +1,12 @@
 {
-    "rewrites": [
+    "routes": [
         {
-            "source": "/api/blogs",
-            "destination": "https://capstone-be-production-3f8e.up.railway.app/blogs"
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
         },
         {
-            "source": "/api/predict",
-            "destination": "https://web-production-c8bf2.up.railway.app/predict"
+            "src": "/(.*)",
+            "dest": "/index.html"
         }
     ]
 }
