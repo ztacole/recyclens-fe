@@ -3,37 +3,40 @@ import fs from 'fs';
 import FormData from 'form-data';
 
 export const config = {
-  api: {
-    bodyParser: false,
-  },
+    api: {
+        bodyParser: false,
+    },
 };
 
 export default async function handler(req, res) {
-  const form = new formidable.IncomingForm({ keepExtensions: true });
+    const form = new formidable.IncomingForm({ keepExtensions: true });
 
-  form.parse(req, async (err, fields, files) => {
-    if (err) {
-      console.error('Form parse error:', err);
-      return res.status(500).json({ error: 'Error parsing form' });
-    }
+    form.parse(req, async (err, fields, files) => {
+        if (err) {
+            console.error('Form parse error:', err);
+            return res.status(500).json({ error: 'Error parsing form' });
+        }
 
-    try {
-      const file = files.file;
+        console.log("Fields:", fields);
+        console.log("Files:", files); // ← pastikan muncul data file!
 
-      const formData = new FormData();
-      formData.append('file', fs.createReadStream(file.filepath), file.originalFilename);
+        try {
+            const file = files.file;
 
-      const response = await fetch("https://web-production-c8bf2.up.railway.app/predict", {
-        method: 'POST',
-        body: formData,
-        headers: formData.getHeaders(), // penting!
-      });
+            const formData = new FormData();
+            formData.append('file', fs.createReadStream(file.filepath), file.originalFilename);
 
-      const data = await response.json();
-      res.status(response.status).json(data);
-    } catch (error) {
-      console.error('Error forwarding to ML backend:', error);
-      res.status(500).json({ error: 'Internal Server Error' });
-    }
-  });
+            const response = await fetch("https://web-production-c8bf2.up.railway.app/predict", {
+                method: 'POST',
+                body: formData,
+                headers: formData.getHeaders(), // penting!
+            });
+
+            const data = await response.json();
+            res.status(response.status).json(data);
+        } catch (error) {
+            console.error('Error forwarding to ML backend:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+        }
+    });
 }
