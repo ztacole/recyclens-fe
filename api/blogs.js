@@ -1,5 +1,5 @@
 // api/blogs.js
-module.exports = async (req, res) => {
+export default blogs = async (req, res) => {
     try {
       console.log('Fetching blogs from:', 'https://capstone-be-production-3f8e.up.railway.app/blogs');
       

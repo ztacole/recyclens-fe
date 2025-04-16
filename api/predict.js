@@ -1,5 +1,5 @@
 // api/predict.js
-module.exports = async (req, res) => {
+export default predict = async (req, res) => {
     try {
       const url = 'https://web-production-c8bf2.up.railway.app/predict';
       
