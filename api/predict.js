@@ -1,33 +1,50 @@
-const predict = async (req, res) => {
-    try {
-      const url = 'https://web-production-c8bf2.up.railway.app/predict';
-      
-      const response = await fetch(url, {
-        method: req.method,
-        headers: {
-          'Content-Type': req.headers['content-type'],
-        },
-        body: req.method !== 'GET' ? req.body : undefined,
-      });
-  
-      res.setHeader('Access-Control-Allow-Origin', '*');
-      res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-      const contentType = response.headers.get('content-type');
-  
-      if (contentType && contentType.includes('application/json')) {
-        const data = await response.json();
-        return res.status(response.status).json(data);
-      } else {
-        const text = await response.text();
-        return res.status(response.status).send(text);
-      }
-    } catch (error) {
-      console.error('Proxy error:', error);
-      return res.status(500).json({ error: 'Proxy error', message: error.message });
+import formidable from "formidable";
+import fs from "fs";
+
+// Disabling default body parser
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ message: "Method not allowed" });
+  }
+
+  const form = formidable({ multiples: false });
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      console.error("Formidable error:", err);
+      return res.status(500).json({ message: "Failed to parse form data" });
     }
-  };
-  
-  export default predict;
-  
+
+    const file = files.file;
+    if (!file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    try {
+      const fileData = fs.readFileSync(file[0].filepath);
+
+      // Forward ke backend Python
+      const response = await fetch("https://web-production-c8bf2.up.railway.app/predict", {
+        method: "POST",
+        headers: {
+          // Kalau backend Flask kamu pakai form upload
+          "Content-Type": "application/octet-stream",
+          "Content-Disposition": `form-data; name="file"; filename="${file[0].originalFilename}"`,
+        },
+        body: fileData,
+      });
+
+      const data = await response.json();
+      return res.status(response.status).json(data);
+    } catch (error) {
+      console.error("Error forwarding to ML backend:", error);
+      return res.status(500).json({ message: "Failed to send image to ML API" });
+    }
+  });
+}
