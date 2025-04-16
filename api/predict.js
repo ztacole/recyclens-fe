@@ -36,7 +36,7 @@ export default async function handler(req, res) {
                 headers: {
                     // Kalau backend Flask kamu pakai form upload
                     "Content-Type": "application/octet-stream",
-                    "Content-Disposition": `form-data; name="file"; filename="${file[0].originalFilename}"`,
+                    "Content-Disposition": `form-data; name="file"; filename="${file.originalFilename}"`,
                 },
                 body: fileData,
             });
